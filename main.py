@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import edge_tts
+from gtts import gTTS
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -46,6 +47,16 @@ def _normalize_effect(value: str, suffix: str) -> str:
 	if cleaned_value and cleaned_value[0] not in "+-":
 		return f"+{cleaned_value}"
 	return cleaned_value or f"+0{suffix}"
+
+
+def _infer_language_code(voice_name: str) -> str:
+	match = re.match(r"^([a-z]{2})(?:-[A-Z]{2})?", voice_name)
+	return match.group(1) if match else "en"
+
+
+def _save_with_gtts(text: str, voice_name: str, output_path: Path) -> None:
+	language_code = _infer_language_code(voice_name)
+	gTTS(text=text, lang=language_code).save(str(output_path))
 
 
 @lru_cache(maxsize=1)
@@ -100,6 +111,7 @@ async def create_tts(payload: TTSRequest) -> JSONResponse:
 	rate = _normalize_effect(payload.rate, "%")
 	pitch = _normalize_effect(payload.pitch, "Hz")
 	volume = _normalize_effect(payload.volume, "%")
+	message = "สร้างไฟล์เสียงสำเร็จ"
 
 	try:
 		communicator = edge_tts.Communicate(
@@ -110,13 +122,17 @@ async def create_tts(payload: TTSRequest) -> JSONResponse:
 			volume=volume,
 		)
 		await communicator.save(str(output_path))
-	except Exception as exc:  # pragma: no cover - runtime/network dependent
-		raise HTTPException(status_code=500, detail=f"สร้างไฟล์เสียงไม่สำเร็จ: {exc}") from exc
+	except Exception:
+		try:
+			_save_with_gtts(payload.text.strip(), payload.voice, output_path)
+			message = "สร้างไฟล์เสียงสำเร็จด้วย fallback"
+		except Exception as exc:  # pragma: no cover - runtime/network dependent
+			raise HTTPException(status_code=500, detail=f"สร้างไฟล์เสียงไม่สำเร็จ: {exc}") from exc
 
 	file_url = f"/downloads/{output_name}"
 	return JSONResponse(
 		{
-			"message": "สร้างไฟล์เสียงสำเร็จ",
+			"message": message,
 			"filename": output_name,
 			"download_url": file_url,
 			"preview_url": file_url,

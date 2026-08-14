@@ -1,40 +1,39 @@
 # Sound Studio
 
-เว็บ TTS ด้วย `edge-tts` สำหรับพิมพ์ข้อความ เลือกเสียง ปรับค่าเสียง แล้วดาวน์โหลดไฟล์ mp3 ได้จากหน้าเว็บเดียว
+เว็บแปลงข้อความเป็นเสียงด้วย `edge-tts` ที่ใช้งานได้จากหน้าเว็บเดียว รองรับการพิมพ์ข้อความ เลือกเสียง ปรับ rate / pitch / volume และดาวน์โหลดไฟล์ `.mp3` ได้ทันที
 
-## รันในเครื่อง
+## วิธีใช้งานในเครื่อง
+
+1. ติดตั้งแพ็กเกจ
 
 ```bash
 python -m pip install -r requirements.txt
+```
+
+2. เปิดเว็บเซิร์ฟเวอร์
+
+```bash
 uvicorn main:app --reload
 ```
 
-เปิด `http://127.0.0.1:8000`
+3. เปิดเบราว์เซอร์ที่
 
-## โครงสร้าง API
-
-- `GET /` หน้าเว็บหลัก
-- `GET /api/voices` รายการเสียงจาก edge-tts
-- `POST /api/tts` สร้างไฟล์เสียง mp3
-- `GET /downloads/{filename}` ดาวน์โหลดไฟล์ที่สร้างแล้ว
-
-## อัปขึ้น GitHub
-
-ถ้าต้องการใช้รีโมตที่ให้มา:
-
-```bash
-git remote add origin https://github.com/CMEBOOST/Sound.git
-git add .
-git commit -m "Build responsive edge-tts web app"
-git push -u origin main
+```text
+http://127.0.0.1:8000
 ```
 
-## ดีพลอยฟรี
+## วิธีใช้หน้าเว็บ
 
-ตัวอย่างที่ง่ายสุดคือ Render เพราะโปรเจกต์มี `render.yaml` ให้แล้ว
+1. พิมพ์ข้อความที่ต้องการแปลงเป็นเสียง
+2. เลือกเสียงที่ต้องการจากรายการ
+3. ปรับค่า `rate`, `pitch`, และ `volume` ตามต้องการ
+4. กดปุ่มสร้างเสียง
+5. ฟังตัวอย่าง หรือกดดาวน์โหลดไฟล์ `.mp3`
 
-1. สร้างเว็บใหม่บน Render จาก GitHub repo นี้
-2. ให้ใช้ค่าใน `render.yaml`
-3. Deploy แล้วเปิด URL ที่ Render สร้างให้
+## ไฟล์สำคัญในโปรเจกต์
 
-ถ้าต้องการ ผมช่วยจัดเวอร์ชันสำหรับ Vercel, Railway, Fly.io หรือ GitHub Pages แบบแยกหน้า frontend ให้ได้ แต่แบบนี้ backend Python จะเหมาะกับ Render มากกว่า
+- [main.py](main.py) ตัว backend หลักของเว็บ
+- [templates/index.html](templates/index.html) หน้าเว็บหลัก
+- [static/app.js](static/app.js) logic ฝั่งหน้าเว็บ
+- [static/style.css](static/style.css) สไตล์ responsive
+- [render.yaml](render.yaml) ค่าพร้อม deploy บน Render
