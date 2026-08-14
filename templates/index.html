@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">edge-tts web studio</span>
+                <h1>แปลงข้อความเป็นเสียงในหน้าเว็บเดียว</h1>
+                <p>
+                    พิมพ์ข้อความ เลือกเสียง ปรับ rate, pitch, volume แล้วกดสร้างไฟล์ได้ทันที
+                    รองรับ responsive และดาวน์โหลด mp3 จากหน้าเว็บโดยตรง
+                </p>
+                <div class="hero-badges">
+                    <span>Responsive</span>
+                    <span>Download MP3</span>
+                    <span>Voice Library</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-card-top">
+                    <strong>Quick Start</strong>
+                    <span id="statusPill">พร้อมใช้งาน</span>
+                </div>
+                <ol>
+                    <li>วางข้อความลงในช่องด้านล่าง</li>
+                    <li>เลือกเสียงและตั้งค่าตามต้องการ</li>
+                    <li>กดสร้าง แล้วดาวน์โหลดไฟล์ได้ทันที</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="studio-grid">
+            <article class="panel composer-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>ข้อความ</h2>
+                        <p>รองรับข้อความยาวสูงสุด 5,000 ตัวอักษร</p>
+                    </div>
+                    <span id="charCount">0 / 5000</span>
+                </div>
+
+                <textarea id="textInput" maxlength="5000" placeholder="พิมพ์ข้อความที่ต้องการแปลงเป็นเสียง..."></textarea>
+
+                <div class="field-row">
+                    <label>
+                        <span>ค้นหาเสียง</span>
+                        <input id="voiceSearch" type="search" placeholder="ค้นหาชื่อเสียงหรือภาษา">
+                    </label>
+                    <label>
+                        <span>เสียง</span>
+                        <select id="voiceSelect"></select>
+                    </label>
+                </div>
+
+                <div class="sliders">
+                    <label>
+                        <span>Rate <b id="rateValue">0%</b></span>
+                        <input id="rateRange" type="range" min="-50" max="50" value="0">
+                    </label>
+                    <label>
+                        <span>Pitch <b id="pitchValue">0Hz</b></span>
+                        <input id="pitchRange" type="range" min="-50" max="50" value="0">
+                    </label>
+                    <label>
+                        <span>Volume <b id="volumeValue">0%</b></span>
+                        <input id="volumeRange" type="range" min="-50" max="50" value="0">
+                    </label>
+                </div>
+
+                <div class="actions">
+                    <button id="generateBtn" type="button">สร้างเสียง</button>
+                    <button id="clearBtn" type="button" class="ghost">ล้างข้อความ</button>
+                </div>
+
+                <p id="errorBox" class="message error" hidden></p>
+                <p id="successBox" class="message success" hidden></p>
+            </article>
+
+            <aside class="panel result-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>ผลลัพธ์</h2>
+                        <p>ฟังตัวอย่างก่อน แล้วกดดาวน์โหลดจากปุ่มด้านล่าง</p>
+                    </div>
+                </div>
+
+                <div class="audio-shell">
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+
+                <a id="downloadLink" class="download-link disabled" href="#" download>ยังไม่มีไฟล์ให้ดาวน์โหลด</a>
+
+                <div class="result-meta">
+                    <div>
+                        <span>เสียงที่เลือก</span>
+                        <strong id="selectedVoice">-</strong>
+                    </div>
+                    <div>
+                        <span>สถานะ</span>
+                        <strong id="resultStatus">รอสร้างไฟล์</strong>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
