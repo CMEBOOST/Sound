@@ -29,14 +29,23 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 class TTSRequest(BaseModel):
 	text: str = Field(min_length=1, max_length=5000)
 	voice: str = Field(min_length=1, max_length=128)
-	rate: str = Field(default="+0%", pattern=r"^[+-]\d{1,3}%$")
-	pitch: str = Field(default="+0Hz", pattern=r"^[+-]\d{1,3}Hz$")
-	volume: str = Field(default="+0%", pattern=r"^[+-]\d{1,3}%$")
+	rate: str = Field(default="+0%", max_length=16)
+	pitch: str = Field(default="+0Hz", max_length=16)
+	volume: str = Field(default="+0%", max_length=16)
 
 
 def _sanitize_filename(value: str) -> str:
 	value = re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("._-")
 	return value or "sound"
+
+
+def _normalize_effect(value: str, suffix: str) -> str:
+	cleaned_value = str(value).strip()
+	if cleaned_value in {f"0{suffix}", f"+0{suffix}", f"-0{suffix}"}:
+		return f"+0{suffix}"
+	if cleaned_value and cleaned_value[0] not in "+-":
+		return f"+{cleaned_value}"
+	return cleaned_value or f"+0{suffix}"
 
 
 @lru_cache(maxsize=1)
@@ -88,14 +97,17 @@ async def voices() -> JSONResponse:
 async def create_tts(payload: TTSRequest) -> JSONResponse:
 	output_name = f"tts_{uuid.uuid4().hex}.mp3"
 	output_path = GENERATED_DIR / output_name
+	rate = _normalize_effect(payload.rate, "%")
+	pitch = _normalize_effect(payload.pitch, "Hz")
+	volume = _normalize_effect(payload.volume, "%")
 
 	try:
 		communicator = edge_tts.Communicate(
 			text=payload.text.strip(),
 			voice=payload.voice,
-			rate=payload.rate,
-			pitch=payload.pitch,
-			volume=payload.volume,
+			rate=rate,
+			pitch=pitch,
+			volume=volume,
 		)
 		await communicator.save(str(output_path))
 	except Exception as exc:  # pragma: no cover - runtime/network dependent

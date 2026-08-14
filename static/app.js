@@ -21,6 +21,10 @@ const statusPill = document.getElementById('statusPill');
 let allVoices = [];
 
 function clampLabel(value, suffix) {
+  if (value === 0) {
+    return `+0${suffix}`;
+  }
+
   return `${value > 0 ? '+' : ''}${value}${suffix}`;
 }
 
@@ -133,7 +137,13 @@ async function generateAudio() {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail || 'สร้างไฟล์เสียงไม่สำเร็จ');
+      const detail = data.detail;
+      const message = Array.isArray(detail)
+        ? detail
+            .map((item) => item.msg || item.message || item.loc?.join('.') || JSON.stringify(item))
+            .join(', ')
+        : (typeof detail === 'string' ? detail : 'สร้างไฟล์เสียงไม่สำเร็จ');
+      throw new Error(message);
     }
 
     const url = data.download_url;

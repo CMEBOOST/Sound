@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
+generated/
+*.mp3
 
 # Virtual environments
 .venv
